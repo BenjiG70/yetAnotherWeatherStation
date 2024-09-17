@@ -1,0 +1,19 @@
+.sensor-container {
+    display: flex;
+    flex-wrap: wrap;  // Ermöglicht das Umbrechen von Elementen, wenn der Platz nicht ausreicht
+    gap: 1rem;  // Abstand zwischen den Sensoren
+  }
+  
+  .sensor-data {
+    flex: 1 1 300px;  // Flex-Eigenschaften: wächst, schrumpft, Basisgröße
+    box-sizing: border-box;
+    padding: 1rem;
+    // border: 1px solid #ddd;
+    // border-radius: 4px;
+    // background-color: #f9f9f9;
+    margin: 0.5rem;
+  }
+  
+// .body{
+//   background-color: #333;
+// }
