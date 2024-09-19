@@ -26,9 +26,46 @@ export class SensorDetailsDialogComponent implements OnInit {
   constructor(private db: DatabaseService) {}
 
   ngOnInit() {
-    this.getMonthlyData("sensor_1");
+    this.getAlltimeData("sensor_1");
   }
 
+  /**
+   * 
+   * @param sensorName 
+   */
+  getAlltimeData(sensorName: string) {
+    this.db.getWeatherDataBySensor(sensorName).subscribe(
+      data => {
+        this.weatherDataList = [];
+
+        const keys = Object.keys(data);
+        keys.forEach(key => {
+          const item = data[key];
+          this.weatherDataList.push({
+            date: item.datetime,
+            regen: item.regen,
+            temperature: item.temperature,
+            air_pressure: item.air_pressure,
+            humidity: item.humidity
+          });
+        });
+        console.log(this.weatherDataList);
+
+        // Zeichne das Diagramm nach dem Daten-Update
+        if (this.myCanvas.nativeElement) {
+          this.ctx = this.myCanvas.nativeElement.getContext('2d')!;
+          this.drawChart(this.weatherDataList.map(entry => entry.temperature));
+        }
+      },
+      error => {
+        console.error('Fehler beim Abrufen der Wetterdaten:', error);
+      }
+    );
+  }
+  /**
+   * 
+   * @param sensorName 
+   */
   getMonthlyData(sensorName: string) {
     this.db.getWeatherDataBySensor(sensorName).subscribe(
       data => {
@@ -49,7 +86,7 @@ export class SensorDetailsDialogComponent implements OnInit {
         // Zeichne das Diagramm nach dem Daten-Update
         if (this.myCanvas.nativeElement) {
           this.ctx = this.myCanvas.nativeElement.getContext('2d')!;
-          this.drawChart();
+          this.drawChart(this.weatherDataList);
         }
       },
       error => {
@@ -58,8 +95,8 @@ export class SensorDetailsDialogComponent implements OnInit {
     );
   }
 
-  drawChart() {
-    const data = [0,1,0,1,0,1,0,1,0,1,0,1]; //this.weatherDataList.map(entry => entry.regen); // Beispiel: regen-Werte für das Diagramm
+  drawChart(data:any[]) {
+    //const data = [0,1,0,1,0,1,0,1,0,1,0,1]; //this.weatherDataList.map(entry => entry.regen); // Beispiel: regen-Werte für das Diagramm
     const labels = ["Januar", "Februar", "März","April", "Mai", "Juni","Juli", "August", "September","Oktober", "November", "Dezember"]; // Beispiel: Datumsbeschriftungen
     const barWidth = 30;
     const barSpacing = 10;

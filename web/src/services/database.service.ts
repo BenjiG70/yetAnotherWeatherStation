@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { WeatherData, apiData } from '../app/datatypes/weather';
+import { apiData } from '../app/datatypes/weather';
 
 @Injectable({
   providedIn: 'root'
@@ -14,28 +14,28 @@ export class DatabaseService {
   /**
    * Ruft alle Sensordaten von der API ab.
    */
-  getAllSensors(): Observable<apiData> {
-    return this.http.get<apiData>(`${this.apiUrl}/get/all/weather/all`);
+  getAllData(): Observable<apiData> {
+    return this.http.get<apiData>(`${this.apiUrl}/get/all/data`);
   }
 
-  getAllSensor(): Observable<apiData> {
+  getSensors(): Observable<apiData> {
     return this.http.get<apiData>(`${this.apiUrl}/get/all/sensors`);
   }
 
   /**
    * Ruft die Sensordaten für einen bestimmten Sensor ab.
-   * @param sensorName Der Name des Sensors.
+   * @param sensor Der Name des Sensors.
    */
-  getWeatherDataBySensor(sensorName: string): Observable<apiData> {
-    return this.http.get<apiData>(`${this.apiUrl}/get/all/weather/${sensorName}`);
+  getWeatherDataBySensor(sensor: string): Observable<apiData> {
+    return this.http.get<apiData>(`${this.apiUrl}/get/${sensor}/data/all/`);
   }
 
   /**
    * Ruft die letzten Sensordaten für einen bestimmten Sensor ab.
-   * @param sensorName Der Name des Sensors.
+   * @param sensor Der Name des Sensors.
    */
-  getLastWeatherDataBySensor(sensorName: string): Observable<apiData> {
-    return this.http.get<apiData>(`${this.apiUrl}/get/last/weather/${sensorName}`);
+  getLastWeatherDataBySensor(sensor: string): Observable<apiData> {
+    return this.http.get<apiData>(`${this.apiUrl}/get/${sensor}/data/last`);
   }
 
   /**
@@ -43,11 +43,22 @@ export class DatabaseService {
    * @param startDate Das Startdatum im ISO-Format.
    */
   getWeatherDataSince(startDate: string): Observable<apiData> {
-    return this.http.get<apiData>(`${this.apiUrl}/get/weather/since/${startDate}`);
+    return this.http.get<apiData>(`${this.apiUrl}/get/data/since/${startDate}`);
   }
 
-  getMonthlyDataBySensor(sensor:string, year:number): Observable<apiData>{
-    return this.http.get<apiData>(`${this.apiUrl}/get/monthly/data/${sensor}/${year}`)
+  getDataOrderedByMonthBySensor(sensor:string, year:number): Observable<apiData>{
+    return this.http.get<apiData>(`${this.apiUrl}/get/${sensor}/monthlyordered/${year}`);
+  }
+
+  getDataOrderedByMonth(year:number){
+    return this.http.get<apiData>(`${this.apiUrl}/get/monthlyordered/${year}`);
+  }
+
+  getMonthlyDataBySensor(sensor:string){
+    return this.http.get<apiData>(`${this.apiUrl}/get/${sensor}/monthly/log)`);
+  }
+  getMonthlyData(){
+    return this.http.get<apiData>(`${this.apiUrl}/get/all/monthly/log)`);
   }
 
   /**

@@ -22,7 +22,7 @@ export class LandingComponent implements OnInit, OnDestroy {
   }
 
   loadAllSensors(): void {
-    this.dbService.getAllSensors().subscribe(
+    this.dbService.getAllData().subscribe(
       (data: unknown) => {
         if (this.isSensorData(data)) {
           this.sensors = Object.values(data).map(sensorData => sensorData.sensor);

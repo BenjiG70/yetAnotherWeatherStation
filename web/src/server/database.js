@@ -11,7 +11,9 @@ app.use(bodyParser.json());
 
 // connect to database
 const db = new sqlite3.Database('weather.sqlite');
-
+/**
+ * 
+ */
 db.serialize(() => {
     db.run(`
           CREATE TABLE IF NOT EXISTS HISTORY (
@@ -26,83 +28,33 @@ db.serialize(() => {
       `);
 })
 
-//used in every select query
-function getData(sql, res){
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-          return;
-        }
-        const result = {};
-        rows.forEach((row) => {
-          result[row.ID] = row;
-        });
-        res.status(200).json(result);
-      });
+/**
+ * 
+ * @param {*} sql 
+ * @param {*} res 
+ */
+function getData(sql, res) {
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      res.status(400).send(err.message);
+      return;
+    }
+    if (!rows || rows.length === 0) {
+      res.status(404).send('No data found');
+      return;
+    }
+    res.status(200).json(rows);
+    }
+  );
 }
-//used in delete, update and insert query
+
+/**
+ * 
+ * @param {*} sql 
+ * @param {*} res 
+ */
 function changeData(sql, res){
-    db.run(sql, [], (err, rows) => {
-        if (err) {
-          res.status(400).send(err.message);
-          return;
-        }
-        const result = {};
-        rows.forEach((row) => {
-          result[row.ID] = row;
-        });
-        res.status(200).json(result);
-      });
-}
-
-
-//item endpoints
-// Get all items 
-  app.get('/get/all/weather/all', (req, res) => {
-    const sql = `SELECT * FROM HISTORY`;
-    getData(sql, res);
-  });
-
-  app.get('/get/all/weather/:sensor', (req, res) => {
-    const sensor = req.params.sensor;
-    const sql = `SELECT * FROM HISTORY WHERE sensor = "${sensor}"`;
-    getData(sql, res)
-  });
-
-  app.get('/get/last/weather/:sensor', (req, res) => {
-    const sensor = req.params.sensor;
-    const sql = `SELECT * FROM HISTORY WHERE sensor = "${sensor}" ORDER BY ID DESC LIMIT 1`;
-    getData(sql, res)
-  });
-  
-  app.get('/get/monthly/data/:sensor/:year', (req, res) => {
-    const sensor = req.params.sensor;
-    const year = req.params.year;
-    const sql = `SELECT COUNT(regen) FROM HISTORY WHERE sensor = "${sensor}" AND date_time like ${year} ORDER BY Month`;
-    getData(sql, res);
-  });
-
-  // Get all sensors with their latest data
-//   app.get('/get/all/sensors', (req, res) => {
-//     const sql = `
-//         SELECT * FROM HISTORY
-//         WHERE (sensor, DATE_TIME) IN (
-//             SELECT sensor, MAX(DATE_TIME)
-//             FROM HISTORY
-//             GROUP BY sensor
-//         )
-//     `;
-//     getData(sql, res);
-// });
-app.get('/get/all/sensors', (req, res) => {
-  const sql = `SELECT DISTINCT(sensor) FROM HISTORY`;
-  getData(sql, res);
-});
-
-app.get('/get/weather/since/:dateTime', (req, res) => {
-    const dateTime = req.params.dateTime;
-    const sql = `SELECT * FROM HISTORY WHERE DATE_TIME >= ?`;
-    db.all(sql, [dateTime], (err, rows) => {
+  db.run(sql, [], (err, rows) => {
       if (err) {
         res.status(400).send(err.message);
         return;
@@ -112,24 +64,155 @@ app.get('/get/weather/since/:dateTime', (req, res) => {
         result[row.ID] = row;
       });
       res.status(200).json(result);
-    });
-  });
-  
+    }
+  );
+}
 
-  app.post('insert/weatherdata', (req, res) => {
-    const id = getData("SELECT MAX(ID) FROM HISTORY", res) + 1;
-    const temperature = req.body.temperature;
-    const humidity = req.body.humidity;
-    const air_pressure = req.body.air_pressure;
-    const sensor = req.body.sensor;
-    const datetime = new Date();
+/**
+ * getAllData
+ */
+app.get('/get/all/data', (req, res) => {
+  const sql = `SELECT * FROM HISTORY`;
+  getData(sql, res);
+  }
+);
+/** 
+ * getSensors
+ */
+app.get('/get/all/sensors', (req, res) => {
+  const sql = `SELECT DISTINCT(sensor) FROM HISTORY`;
+  getData(sql, res);
+  }
+);
 
-    const sql = `INSERT INTO HISTORY(ID, temperature, humidity, air_pressure, sensor, date_time) 
-                VALUES(${id}, ${temperature}, ${humidity}, ${air_pressure}, "${sensor}", "${datetime}");`
-    changeData(sql, res)
-  });
+/**
+ * getWeatherDataBySensor
+ */
+app.get('/get/:sensor/data/all', (req, res) => {
+  const sensor = req.params.sensor;
+  const sql = `SELECT * FROM HISTORY WHERE sensor = "${sensor}"`;
+  getData(sql, res)
+  }
+);
+/**
+ * getLastWeatherDataBySensor
+ */
+app.get('/get/:sensor/data/last', (req, res) => {
+  const sensor = req.params.sensor;
+  const sql = `SELECT * FROM HISTORY WHERE sensor = "${sensor}" ORDER BY ID DESC LIMIT 1`;
+  getData(sql, res)
+  }
+);
+/**
+ * getWeatherDataSince
+ * WIP
+ */
+app.get('/get/all/data/since/:startDate', (req, res) => {
+    const startDate = req.params.startDate;
+    // work in progress
+    const sql = `SELECT COUNT(regen) FROM HISTORY WHERE date_time like ${startDate}`;
+    getData(sql, res);
+  }
+);
+/**
+ * getWeatherDataSinceBySensor
+ * TBD
+ */
+app.get('/get/:sensor/data/since/:startDate', (req, res) => {
+  const sensor = req.params.sensor;
+  const startDate = req.params.startDate;
+  // work in progress
+  const sql = `SELECT COUNT(regen) FROM HISTORY WHERE date_time like ${startDate}`;
+  getData(sql, res);
+  }
+);
 
-//listening message
+/**
+ * getDataOrderedByMonth
+ * @params year Das Jahr, welches abgefragt werden soll
+ * TBD
+ */
+app.get('/get/all/data/:year', (req, res) => {
+    const year = req.params.year;
+  }
+);
+
+/**
+ * getDataOrderedByMonthBySensor
+ * @params year das Jahr, welches abgefragt werden soll
+ * TBD
+ */
+app.get('/get/:sensor/data/:year', (req, res) => {
+  const year = req.params.year;
+  const sensor = req.params.sensor;
+  }
+);
+
+/**
+ * getMonthlyDataBySensor
+ * @params sensor Sensor, für den die Monatiliche Statistik erstellt werden soll
+ * TBD
+ */
+app.get('/get/:sensor/data/monthly/log', (req, res) => {
+  const month = new Date().getMonth;
+  const sensor = req.params.sensor;
+  }
+);
+/**
+ * getMonthlyData
+ * TBD
+ */
+app.get('/get/all/data/monthly/log', (req, res) => {
+  const month = new Date().getMonth;
+  }
+);
+
+/**
+ * getStatisticDataByYear
+ */
+/**
+ * getStatisticDataByYearBySensor
+ */
+/**
+ * getStatisticDataByMonth
+ */
+/**
+ * getStatisticDataByMonthBySensor
+ */
+/**
+ * getStatisticDataByStartDate
+ */
+/**
+ * getStatisticDataByStartDateBySensor
+ */
+
+
+
+
+
+
+/**
+ * insertWeatherData
+ * @params 
+ */
+app.post('insert/data', (req, res) => {
+  const id = getData("SELECT MAX(ID) FROM HISTORY", res) + 1;
+  const temperature = req.body.temperature;
+  const humidity = req.body.humidity;
+  const air_pressure = req.body.air_pressure;
+  const sensor = req.body.sensor;
+  const datetime = new Date();
+
+  const sql = `INSERT INTO HISTORY(ID, temperature, humidity, air_pressure, sensor, date_time) 
+              VALUES(${id}, ${temperature}, ${humidity}, ${air_pressure}, "${sensor}", "${datetime}");`
+  changeData(sql, res)
+  }
+);
+
+/**
+ * write listeningmessage
+ */
 app.listen(port, () => {    
-    console.log(`Server läuft auf http://localhost:${port}`);
-});
+  console.log(`Server läuft auf http://localhost:${port}`);
+  }
+);
