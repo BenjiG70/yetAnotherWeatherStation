@@ -1,6 +1,6 @@
 export interface WeatherData {
-    datetime: string;
-    id: number;
+    DATE_TIME: string;
+    ID: number;
     temperature: number;
     humidity: number;
     air_pressure: number;

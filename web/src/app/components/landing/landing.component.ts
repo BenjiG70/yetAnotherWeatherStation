@@ -72,7 +72,8 @@ export class LandingComponent implements OnInit, OnDestroy {
         temperatur: sensor.temperature,
         luftfeuchte: sensor.humidity,
         luftdruck: sensor.air_pressure,
-        regen: sensor.regen
+        regen: sensor.regen,
+        zeit: sensor.DATE_TIME
       }
     });
   }

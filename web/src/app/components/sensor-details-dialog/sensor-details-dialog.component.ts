@@ -36,21 +36,21 @@ export class SensorDetailsDialogComponent implements OnInit {
   getAlltimeData(sensorName: string) {
     this.db.getWeatherDataBySensor(sensorName).subscribe(
       data => {
+        console.log(typeof(data))
         this.weatherDataList = [];
-
         const keys = Object.keys(data);
         keys.forEach(key => {
           const item = data[key];
+          console.log(item);
           this.weatherDataList.push({
-            date: item.datetime,
+            date: item.DATE_TIME,
             regen: item.regen,
             temperature: item.temperature,
             air_pressure: item.air_pressure,
             humidity: item.humidity
           });
+          console.log(this.weatherDataList);
         });
-        console.log(this.weatherDataList);
-
         // Zeichne das Diagramm nach dem Daten-Update
         if (this.myCanvas.nativeElement) {
           this.ctx = this.myCanvas.nativeElement.getContext('2d')!;
@@ -75,7 +75,7 @@ export class SensorDetailsDialogComponent implements OnInit {
         keys.forEach(key => {
           const item = data[key];
           this.weatherDataList.push({
-            date: item.datetime,
+            date: item.DATE_TIME,
             regen: item.regen,
             temperature: item.temperature,
             air_pressure: item.air_pressure,

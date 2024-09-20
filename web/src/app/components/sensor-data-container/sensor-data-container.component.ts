@@ -16,5 +16,5 @@ export class SensorDataContainerComponent{
   @Input() luftfeuchte:string = "undefined";
   @Input() luftdruck:string = "undefined";
   @Input() regen:boolean = false;
-  @Input() zeit:string ="undefined";
+  @Input() zeit:string = "undefined";
 }

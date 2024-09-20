@@ -186,11 +186,6 @@ app.get('/get/all/data/monthly/log', (req, res) => {
  * getStatisticDataByStartDateBySensor
  */
 
-
-
-
-
-
 /**
  * insertWeatherData
  * @params 
