@@ -1,14 +1,6 @@
 import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { DatabaseService } from '../../../services/database.service';
-import { WeatherData, apiData } from '../../datatypes/weather';
-
-interface WeatherEntry {
-  date: string;
-  regen: number;
-  temperature: number;
-  air_pressure: number;
-  humidity: number;
-}
+import { WeatherEntry } from '../../datatypes/weather';
 
 @Component({
   selector: 'app-sensor-details-dialog',
@@ -36,41 +28,7 @@ export class SensorDetailsDialogComponent implements OnInit {
   getAlltimeData(sensorName: string) {
     this.db.getWeatherDataBySensor(sensorName).subscribe(
       data => {
-        console.log(typeof(data))
         this.weatherDataList = [];
-        const keys = Object.keys(data);
-        keys.forEach(key => {
-          const item = data[key];
-          console.log(item);
-          this.weatherDataList.push({
-            date: item.DATE_TIME,
-            regen: item.regen,
-            temperature: item.temperature,
-            air_pressure: item.air_pressure,
-            humidity: item.humidity
-          });
-          console.log(this.weatherDataList);
-        });
-        // Zeichne das Diagramm nach dem Daten-Update
-        if (this.myCanvas.nativeElement) {
-          this.ctx = this.myCanvas.nativeElement.getContext('2d')!;
-          this.drawChart(this.weatherDataList.map(entry => entry.temperature));
-        }
-      },
-      error => {
-        console.error('Fehler beim Abrufen der Wetterdaten:', error);
-      }
-    );
-  }
-  /**
-   * 
-   * @param sensorName 
-   */
-  getMonthlyData(sensorName: string) {
-    this.db.getWeatherDataBySensor(sensorName).subscribe(
-      data => {
-        this.weatherDataList = [];
-
         const keys = Object.keys(data);
         keys.forEach(key => {
           const item = data[key];
@@ -81,24 +39,21 @@ export class SensorDetailsDialogComponent implements OnInit {
             air_pressure: item.air_pressure,
             humidity: item.humidity
           });
+          this.buildStatsData(this.weatherDataList, 0)
         });
+        
 
-        // Zeichne das Diagramm nach dem Daten-Update
-        if (this.myCanvas.nativeElement) {
-          this.ctx = this.myCanvas.nativeElement.getContext('2d')!;
-          this.drawChart(this.weatherDataList);
-        }
       },
       error => {
         console.error('Fehler beim Abrufen der Wetterdaten:', error);
       }
     );
   }
-
-  drawChart(data:any[]) {
+  
+  drawChart(data:any[], labels:any[]) {
     //const data = [0,1,0,1,0,1,0,1,0,1,0,1]; //this.weatherDataList.map(entry => entry.regen); // Beispiel: regen-Werte für das Diagramm
-    const labels = ["Januar", "Februar", "März","April", "Mai", "Juni","Juli", "August", "September","Oktober", "November", "Dezember"]; // Beispiel: Datumsbeschriftungen
-    const barWidth = 30;
+    //const labels = ["Januar", "Februar", "März","April", "Mai", "Juni","Juli", "August", "September","Oktober", "November", "Dezember"]; // Beispiel: Datumsbeschriftungen
+    const barWidth = 10;
     const barSpacing = 10;
     const maxBarHeight = 300;
     const canvasWidth = 500;
@@ -130,5 +85,30 @@ export class SensorDetailsDialogComponent implements OnInit {
       this.ctx.fillText(labels[index], 0, 0); // Beschriftung zeichnen
       this.ctx.restore(); // Kontext zurücksetzen
     });
+  }
+  /**
+   * 
+   * @param sensorData 
+   * @param type: 0 = yearly; 1 = monthly; 2 = daily
+   */
+  buildStatsData(sensorData:any[], type:number){
+    const data = sensorData;
+    switch(type){
+      case(0):
+        console.log("hello world");
+        const labels = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+        const data = [12, 14, 10, 0, 0, 0, 0, 1, 6, 20, 25, 24];
+        this.ctx = this.myCanvas.nativeElement.getContext('2d')!;
+        this.drawChart(data, labels);
+        break;
+      case(1):
+        console.log("hello world!");
+        //tbd
+        break;
+      case(2):
+        console.log("hello world!1");
+        //tbd
+        break;
+    }
   }
 }
