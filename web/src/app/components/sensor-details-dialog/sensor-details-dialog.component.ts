@@ -1,6 +1,7 @@
-import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, Inject } from '@angular/core'
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DatabaseService } from '../../../services/database.service';
-import { WeatherEntry } from '../../datatypes/weather';
+import { WeatherEntry} from '../../datatypes/weather'
 
 @Component({
   selector: 'app-sensor-details-dialog',
@@ -10,15 +11,28 @@ import { WeatherEntry } from '../../datatypes/weather';
 
 export class SensorDetailsDialogComponent implements OnInit {
 
+  
+
   weatherDataList: WeatherEntry[] = [];
 
   @ViewChild('myCanvas', { static: false }) myCanvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
 
-  constructor(private db: DatabaseService) {}
+  constructor(private db: DatabaseService, @Inject(MAT_DIALOG_DATA) public data: any) {}
+
+  private avgTemp:any;
 
   ngOnInit() {
-    this.getAlltimeData("sensor_1");
+    this.getAlltimeData(this.data.sensorName);
+  }
+
+  avgData(){
+    this.db.getTempAVGDataBySensor(this.data.sensorName).subscribe(
+      data => {
+        this.avgTemp = data[0];
+      }
+      
+    );console.log(this.avgTemp);
   }
 
   /**

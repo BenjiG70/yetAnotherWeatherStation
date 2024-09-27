@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { apiData } from '../app/datatypes/weather';
+import { apiData } from '../app/datatypes/weather'
 
 @Injectable({
   providedIn: 'root'
@@ -60,7 +60,9 @@ export class DatabaseService {
   getMonthlyData(){
     return this.http.get<apiData>(`${this.apiUrl}/get/all/monthly/log)`);
   }
-
+  getTempAVGDataBySensor(sensor:string){
+    return this.http.get<any>(`${this.apiUrl}/get/${sensor}/data/avg/temp`);
+  }
   /**
    * Fügt neue Sensordaten in die Datenbank ein.
    * @param weatherData Die zu speichernden Sensordaten.

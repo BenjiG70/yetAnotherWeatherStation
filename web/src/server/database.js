@@ -164,6 +164,7 @@ app.get('/get/:sensor/data/monthly/log', (req, res) => {
  */
 app.get('/get/all/data/monthly/log', (req, res) => {
   const month = new Date().getMonth;
+  console.log(month);
   }
 );
 

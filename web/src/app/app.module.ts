@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { RouterModule } from '@angular/router';
 import { HeaderComponent } from './components/header/header.component';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 
 @NgModule({
@@ -35,6 +36,8 @@ import { HeaderComponent } from './components/header/header.component';
     RouterModule
   ],
   providers: [
+  
+    provideAnimationsAsync('noop')
   ],
   bootstrap: [AppComponent]
 })
