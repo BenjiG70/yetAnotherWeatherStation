@@ -191,19 +191,35 @@ app.get('/get/all/data/monthly/log', (req, res) => {
  * insertWeatherData
  * @params 
  */
-app.post('insert/data', (req, res) => {
-  const id = getData("SELECT MAX(ID) FROM HISTORY", res) + 1;
-  const temperature = req.body.temperature;
-  const humidity = req.body.humidity;
-  const air_pressure = req.body.air_pressure;
-  const sensor = req.body.sensor;
-  const datetime = new Date();
+// app.post('/insert/data', (req, res) => {
+//   const id = getData("SELECT MAX(ID) FROM HISTORY", res) + 1;
+//   const temperature = req.body.temperature;
+//   const humidity = req.body.humidity;
+//   const air_pressure = req.body.air_pressure;
+//   const sensor = req.body.sensor;
+//   const datetime = new Date();
 
-  const sql = `INSERT INTO HISTORY(ID, temperature, humidity, air_pressure, sensor, date_time) 
-              VALUES(${id}, ${temperature}, ${humidity}, ${air_pressure}, "${sensor}", "${datetime}");`
-  changeData(sql, res)
-  }
-);
+//   const sql = `INSERT INTO HISTORY(ID, temperature, humidity, air_pressure, sensor, date_time) 
+//               VALUES(${id}, ${temperature}, ${humidity}, ${air_pressure}, "${sensor}", "${datetime}");`
+//   changeData(sql, res)
+//   console.log("es passiert was")
+//   }
+// );
+
+app.post('/insert/data', (req, res) => {
+  const sqlInsert = `INSERT INTO HISTORY (temperature, humidity, air_pressure, sensor, date_time) VALUES (?, ?, ?, ?, ?)`;
+  const values = [req.body.temperature, req.body.humidity, req.body.air_pressure, req.body.sensor, new Date()];
+
+  db.run(sqlInsert, values, function (err) {
+    if (err) {
+      // Wenn ein Fehler auftritt, sende die Antwort und kehre zurück, um den Rest der Logik zu stoppen
+      return res.status(500).json({ error: "Datenbankfehler: " + err.message });
+    }
+
+    // Wenn die Einfügung erfolgreich ist, sende die Antwort nur einmal
+    res.status(200).json({ message: 'Daten erfolgreich eingefügt', id: this.lastID });
+  });
+});
 
 /**
  * write listeningmessage
